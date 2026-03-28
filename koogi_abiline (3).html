@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Köögiabiline</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e0c;
+    --surface: #1a1916;
+    --surface2: #242220;
+    --border: #2e2c28;
+    --accent: #e8a838;
+    --accent2: #c45c2e;
+    --text: #f0ebe3;
+    --muted: #7a7568;
+    --green: #4a7c59;
+    --red: #8b3a2a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .nav-tabs {
+    display: flex;
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 4px;
+    gap: 2px;
+  }
+
+  .nav-tab {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .nav-tab.active {
+    background: var(--accent);
+    color: #000;
+  }
+
+  .page { display: none; padding: 20px; }
+  .page.active { display: block; }
+
+  /* ---- COOK PAGE ---- */
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+
+  .toggle-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .toggle-btn {
+    padding: 14px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .toggle-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(232,168,56,0.08);
+  }
+
+  .toggle-btn.active-sin {
+    border-color: var(--accent2);
+    color: var(--accent2);
+    background: rgba(196,92,46,0.08);
+  }
+
+  .people-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .people-btn {
+    padding: 12px 8px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .people-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(232,168,56,0.08);
+  }
+
+  .wish-input {
+    width: 100%;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 20px;
+  }
+
+  .wish-input:focus { border-color: var(--accent); }
+  .wish-input::placeholder { color: var(--muted); }
+
+  .cook-btn {
+    width: 100%;
+    padding: 18px;
+    border-radius: 14px;
+    border: none;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: -0.3px;
+  }
+
+  .cook-btn:active { transform: scale(0.98); }
+  .cook-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .recipes-container {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .recipe-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .recipe-card:hover, .recipe-card:active {
+    border-color: var(--accent);
+  }
+
+  .recipe-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .recipe-card p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .recipe-card .meta {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: var(--surface2);
+    color: var(--muted);
+  }
+
+  .badge.healthy { background: rgba(74,124,89,0.2); color: #6dbb8a; }
+  .badge.sin { background: rgba(196,92,46,0.2); color: #e07850; }
+
+  /* Full recipe view */
+  .recipe-full {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--bg);
+    z-index: 200;
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  .recipe-full.open { display: block; }
+
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+
+  .recipe-full h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .recipe-full .recipe-meta {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .recipe-section-title {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 20px 0 10px;
+  }
+
+  .ingredient-list {
+    background: var(--surface);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .ingredient-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .ingredient-item:last-child { border-bottom: none; }
+  .ingredient-item .amount { color: var(--accent); font-weight: 500; }
+
+  .steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    min-width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #000;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+
+  .step-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  .loading-dots {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    padding: 30px;
+  }
+
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: bounce 1.2s infinite;
+  }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ---- PANTRY PAGE ---- */
+  .add-item-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .add-item-row input {
+    flex: 1;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .add-item-row input:focus { border-color: var(--accent); }
+  .add-item-row input::placeholder { color: var(--muted); }
+
+  .add-item-btn {
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: none;
+    background: var(--accent);
+    color: #000;
+    font-size: 22px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .scan-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 2px dashed var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+
+  .scan-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  #receipt-input { display: none; }
+
+  .pantry-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .pantry-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .pantry-item-name { flex: 1; }
+
+  .remove-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+  }
+
+  .remove-btn:hover { color: var(--red); }
+
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 20px;
+    font-size: 14px;
+  }
+
+  /* ---- PROFILE PAGE ---- */
+  .profile-section {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+
+  .profile-section h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    margin-bottom: 14px;
+    color: var(--accent);
+  }
+
+  .profile-input {
+    width: 100%;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    margin-bottom: 8px;
+    resize: none;
+  }
+
+  .profile-input:focus { border-color: var(--accent); }
+  .profile-input::placeholder { color: var(--muted); }
+
+  .save-profile-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: var(--green);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  /* ---- HISTORY PAGE ---- */
+  .history-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+
+  .history-item h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .history-item .hist-meta {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .status-msg {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  /* Cuisine selector */
+  .cuisine-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 20px;
+    scrollbar-width: none;
+  }
+  .cuisine-scroll::-webkit-scrollbar { display: none; }
+
+  .cuisine-btn {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .cuisine-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(232,168,56,0.08);
+  }
+
+  /* Shopping list */
+  .shop-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .shop-item.checked {
+    opacity: 0.5;
+    text-decoration: line-through;
+  }
+
+  .shop-check {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 11px;
+  }
+
+  .shop-item.checked .shop-check {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+  }
+
+  .shop-generate-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 16px;
+    transition: all 0.2s;
+  }
+
+  .shop-generate-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .shop-add-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .shop-add-row input {
+    flex: 1;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+  }
+  .shop-add-row input:focus { border-color: var(--accent); }
+  .shop-add-row input::placeholder { color: var(--muted); }
+
+  .shop-add-row button {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: #000;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .clear-checked-btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  /* Ingredient check modal */
+  .ing-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 300;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  .ing-modal.open { display: block; }
+  .ing-modal-box {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 24px 20px;
+    margin-top: 40px;
+  }
+  .ing-modal-box h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .ing-modal-box p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .ing-check-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+  }
+  .ing-check-item:last-child { border-bottom: none; }
+  .ing-check-left { flex: 1; }
+  .ing-check-name { font-size: 14px; font-weight: 500; }
+  .ing-check-amount { font-size: 12px; color: var(--muted); }
+  .ing-check-btns { display: flex; gap: 6px; }
+  .ing-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 2px solid var(--border);
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.15s;
+  }
+  .ing-btn.yes { border-color: var(--green); color: #6dbb8a; }
+  .ing-btn.yes.sel { background: var(--green); color: #fff; }
+  .ing-btn.no { border-color: var(--red); color: #e07850; }
+  .ing-btn.no.sel { background: var(--red); color: #fff; }
+  .ing-btn.alt { border-color: var(--accent); color: var(--accent); }
+  .ing-modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .ing-confirm-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    border: none;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .ing-skip-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">🍳 Köögiabiline</div>
+</div>
+
+<div class="nav-tabs" style="margin: 12px 20px 0; overflow-x:auto; scrollbar-width:none;">
+  <button class="nav-tab active" onclick="showPage('cook', this)">Söök</button>
+  <button class="nav-tab" onclick="showPage('pantry', this)">Varud</button>
+  <button class="nav-tab" onclick="showPage('shop', this)">Pood 🛒</button>
+  <button class="nav-tab" onclick="showPage('history', this)">Ajalugu</button>
+  <button class="nav-tab" onclick="showPage('profile', this)">Profiil</button>
+</div>
+
+<!-- COOK PAGE -->
+<div id="page-cook" class="page active">
+
+  <div class="section-label" style="margin-top:20px;">Millal sööd?</div>
+  <div class="toggle-row">
+    <button class="toggle-btn active" id="btn-morning" onclick="setMeal('morning')">🌅 Hommik</button>
+    <button class="toggle-btn" id="btn-evening" onclick="setMeal('evening')">🌙 Õhtu</button>
+  </div>
+
+  <div class="section-label">Mis tuju?</div>
+  <div class="toggle-row">
+    <button class="toggle-btn active" id="btn-healthy" onclick="setMode('healthy')">🥗 Tervislik</button>
+    <button class="toggle-btn" id="btn-sin" onclick="setMode('sin')">🔥 Patt lubatud</button>
+  </div>
+
+  <div class="section-label">Mitu inimest?</div>
+  <div class="people-row">
+    <button class="people-btn active" id="p1" onclick="setPeople(1)">1</button>
+    <button class="people-btn" id="p2" onclick="setPeople(2)">2</button>
+    <button class="people-btn" id="p3" onclick="setPeople(3)">3</button>
+    <button class="people-btn" id="p4" onclick="setPeople(4)">4+</button>
+  </div>
+
+  <div class="section-label">Köögi stiil</div>
+  <div class="cuisine-scroll" id="cuisine-row">
+    <button class="cuisine-btn active" onclick="setCuisine('', this)">🌍 Ükskõik</button>
+    <button class="cuisine-btn" onclick="setCuisine('Eesti/Põhjamaa', this)">🇪🇪 Eesti</button>
+    <button class="cuisine-btn" onclick="setCuisine('Itaalia', this)">🇮🇹 Itaalia</button>
+    <button class="cuisine-btn" onclick="setCuisine('Jaapani', this)">🇯🇵 Jaapan</button>
+    <button class="cuisine-btn" onclick="setCuisine('Aasia', this)">🥢 Aasia</button>
+    <button class="cuisine-btn" onclick="setCuisine('Mehhiko', this)">🌮 Mehhiko</button>
+    <button class="cuisine-btn" onclick="setCuisine('Vahemere', this)">🫒 Vahemere</button>
+    <button class="cuisine-btn" onclick="setCuisine('India', this)">🇮🇳 India</button>
+    <button class="cuisine-btn" onclick="setCuisine('Prantsuse', this)">🇫🇷 Prantsuse</button>
+  </div>
+
+  <div class="section-label">Mul on isu... (vabatahtlik)</div>
+  <input type="text" class="wish-input" id="wish-input" placeholder="nt. tuunikala, krevetid, pasta...">
+
+  <button class="cook-btn" id="cook-btn" onclick="getCookSuggestions()">Paku mulle retsepte ✨</button>
+
+  <div id="recipes-container" class="recipes-container"></div>
+</div>
+
+<!-- PANTRY PAGE -->
+<div id="page-pantry" class="page">
+  <div style="margin-top:20px;">
+    <div class="add-item-row">
+      <input type="text" id="pantry-input" placeholder="Lisa toode..." onkeydown="if(event.key==='Enter')addPantryItem()">
+      <button class="add-item-btn" onclick="addPantryItem()">+</button>
+    </div>
+
+    <button class="scan-btn" onclick="toggleImport()">
+      📋 Kopeeri Google Dokist → impordi nimekiri
+    </button>
+
+    <div id="import-box" style="display:none; margin-bottom:16px;">
+      <textarea class="profile-input" id="import-text" rows="6" placeholder="Kleebi siia oma varude nimekiri (üks toode rea kohta)..."></textarea>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button class="add-item-btn" style="flex:1; font-size:14px; font-family:'DM Sans',sans-serif;" onclick="importItems('add')">+ Lisa olemasolevale</button>
+        <button class="add-item-btn" style="flex:1; font-size:14px; font-family:'DM Sans',sans-serif; background:var(--accent2);" onclick="importItems('replace')">↺ Asenda kõik</button>
+      </div>
+    </div>
+
+    <button class="scan-btn" onclick="toggleReceiptPaste()">
+      🧾 Kleebi tšeki tekst → Claude eraldab tooted
+    </button>
+
+    <div id="receipt-paste-box" style="display:none; margin-bottom:16px;">
+      <textarea class="profile-input" id="receipt-paste-text" rows="8" placeholder="Kleebi siia tšeki tekst (kopeeri poeprogrammist või äpist)..."></textarea>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button class="add-item-btn" style="flex:1; font-size:14px; font-family:'DM Sans',sans-serif;" onclick="parseReceiptText('add')">+ Lisa olemasolevale</button>
+        <button class="add-item-btn" style="flex:1; font-size:14px; font-family:'DM Sans',sans-serif; background:var(--accent2);" onclick="parseReceiptText('replace')">↺ Asenda kõik</button>
+      </div>
+    </div>
+
+    <button class="scan-btn" onclick="document.getElementById('receipt-input').click()">
+      📷 Pildista tšekk → lisa tooted automaatselt
+    </button>
+    <input type="file" id="receipt-input" accept="image/*" capture="environment" onchange="scanReceipt(this)">
+
+    <div id="scan-status"></div>
+
+    <div class="section-label">Kodus olemas (<span id="pantry-count">0</span>)</div>
+    <div id="pantry-list" class="pantry-list">
+      <div class="empty-state">Lisa esimene toode 👆</div>
+    </div>
+  </div>
+</div>
+
+<!-- SHOP PAGE -->
+<div id="page-shop" class="page">
+  <div style="margin-top:20px;">
+    <div class="section-label">Nädala suund</div>
+    <div class="cuisine-scroll" id="shop-cuisine-row">
+      <button class="cuisine-btn active" onclick="setShopCuisine('', this)">🌍 Mix</button>
+      <button class="cuisine-btn" onclick="setShopCuisine('Eesti/Põhjamaa', this)">🇪🇪 Eesti</button>
+      <button class="cuisine-btn" onclick="setShopCuisine('Itaalia', this)">🇮🇹 Itaalia</button>
+      <button class="cuisine-btn" onclick="setShopCuisine('Jaapani', this)">🇯🇵 Jaapan</button>
+      <button class="cuisine-btn" onclick="setShopCuisine('Aasia', this)">🥢 Aasia</button>
+      <button class="cuisine-btn" onclick="setShopCuisine('Mehhiko', this)">🌮 Mehhiko</button>
+      <button class="cuisine-btn" onclick="setShopCuisine('Vahemere', this)">🫒 Vahemere</button>
+      <button class="cuisine-btn" onclick="setShopCuisine('India', this)">🇮🇳 India</button>
+      <button class="cuisine-btn" onclick="setShopCuisine('Prantsuse', this)">🇫🇷 Prantsuse</button>
+    </div>
+
+    <button class="shop-generate-btn" onclick="generateShopList()">
+      🤖 Genereeri ostunimekiri
+    </button>
+
+    <div id="shop-status"></div>
+
+    <div class="shop-add-row">
+      <input type="text" id="shop-input" placeholder="Lisa käsitsi..." onkeydown="if(event.key==='Enter')addShopItem()">
+      <button onclick="addShopItem()">+</button>
+    </div>
+
+    <div class="section-label">Ostunimekiri (<span id="shop-count">0</span>)</div>
+    <div id="shop-list"></div>
+    <button class="clear-checked-btn" onclick="clearChecked()">✓ Eemalda ostetud</button>
+  </div>
+</div>
+
+<!-- HISTORY PAGE -->
+<div id="page-history" class="page">
+  <div style="margin-top:20px;">
+    <div class="section-label">Varasemad retseptid</div>
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<!-- PROFILE PAGE -->
+<div id="page-profile" class="page">
+  <div style="margin-top:20px;">
+    <div class="profile-section">
+      <h3>Minu eelistused</h3>
+      <textarea class="profile-input" id="pref-likes" rows="2" placeholder="Mis sulle meeldib? (nt. kreemised kastmed, kana, kala...)"></textarea>
+      <textarea class="profile-input" id="pref-dislikes" rows="2" placeholder="Mida ei söö? (nt. seller, lämbe toit...)"></textarea>
+      <textarea class="profile-input" id="pref-spice" rows="1" placeholder="Vürtsitase (kerge / keskmine / tuline)"></textarea>
+    </div>
+    <div class="profile-section">
+      <h3>Partneri eelistused</h3>
+      <textarea class="profile-input" id="pref-partner" rows="2" placeholder="Partneri eripärad..."></textarea>
+    </div>
+    <div class="profile-section">
+      <h3>Muu info</h3>
+      <textarea class="profile-input" id="pref-other" rows="2" placeholder="nt. kaalulangetus eesmärk, allergiad..."></textarea>
+    </div>
+    <button class="save-profile-btn" onclick="saveProfile()">💾 Salvesta profiil</button>
+  </div>
+</div>
+
+<!-- FULL RECIPE VIEW -->
+<div id="recipe-full" class="recipe-full">
+  <button class="back-btn" onclick="closeRecipe()">← Tagasi</button>
+  <div id="recipe-full-content"></div>
+</div>
+
+<script>
+// State
+let mealTime = 'morning';
+let modeType = 'healthy';
+let peopleCount = 1;
+let cuisineType = '';
+let shopCuisine = '';
+let pantry = JSON.parse(localStorage.getItem('pantry') || '[]');
+let history = JSON.parse(localStorage.getItem('recipeHistory') || '[]');
+let profile = JSON.parse(localStorage.getItem('profile') || '{}');
+let shopList = JSON.parse(localStorage.getItem('shopList') || '[]');
+let currentRecipes = [];
+
+// Init
+renderPantry();
+renderHistory();
+loadProfile();
+renderShopList();
+
+function showPage(p, btn) {
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+function setMeal(m) {
+  mealTime = m;
+  document.getElementById('btn-morning').className = 'toggle-btn' + (m==='morning' ? ' active' : '');
+  document.getElementById('btn-evening').className = 'toggle-btn' + (m==='evening' ? ' active' : '');
+}
+
+function setMode(m) {
+  modeType = m;
+  document.getElementById('btn-healthy').className = 'toggle-btn' + (m==='healthy' ? ' active' : '');
+  document.getElementById('btn-sin').className = 'toggle-btn' + (m==='sin' ? ' active-sin' : '');
+}
+
+function setPeople(n) {
+  peopleCount = n;
+  ['p1','p2','p3','p4'].forEach(id => document.getElementById(id).classList.remove('active'));
+  document.getElementById('p'+n).classList.add('active');
+}
+
+function setCuisine(c, btn) {
+  cuisineType = c;
+  document.querySelectorAll('.cuisine-btn').forEach(el => el.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function setShopCuisine(c, btn) {
+  shopCuisine = c;
+  document.querySelectorAll('#shop-cuisine-row .cuisine-btn').forEach(el => el.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+async function getCookSuggestions() {
+  const btn = document.getElementById('cook-btn');
+  const container = document.getElementById('recipes-container');
+  const wish = document.getElementById('wish-input').value.trim();
+
+  if (pantry.length === 0 && !wish) {
+    container.innerHTML = '<div class="status-msg">Lisa esmalt tooted varude nimekirja 🛒</div>';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Mõtlen...';
+  container.innerHTML = '<div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+
+  const pantryList = pantry.join(', ');
+  const mealLabel = mealTime === 'morning' ? 'hommikusöök (maksimaalselt 20 minutit valmistusaeg)' : 'õhtusöök (kuni 40 minutit)';
+  const modeLabel = modeType === 'healthy' ? 'tervislik, kaalulangetusele sobiv (vähem süsivesikuid)' : 'maitsev ja priskem, "patt lubatud" söök';
+  const profileText = [
+    profile.likes ? 'Meeldib: ' + profile.likes : '',
+    profile.dislikes ? 'Ei söö: ' + profile.dislikes : '',
+    profile.spice ? 'Vürtsitase: ' + profile.spice : '',
+    profile.partner ? 'Partner: ' + profile.partner : '',
+    profile.other ? 'Muu: ' + profile.other : ''
+  ].filter(Boolean).join('. ');
+
+  const prompt = `Sa oled professionaalne kokk. Paku täpselt 3 retsepti järgmiste tingimuste alusel.
+
+Söögiaeg: ${mealLabel}
+Stiil: ${modeLabel}
+Portsjoneid: ${peopleCount === 4 ? '4+' : peopleCount}
+${cuisineType ? 'Köögi stiil: ' + cuisineType + ' köök' : ''}
+Kodus olemas: ${pantryList || 'tavaline kodune varustus'}
+${wish ? 'Kasutaja soov: ' + wish : ''}
+${profileText ? 'Kasutaja profiil: ' + profileText : ''}
+
+Vasta AINULT JSON formaadis, ilma markdown backtick'ideta:
+{"recipes":[{"title":"...","description":"...","time":"...min","ingredients":[{"name":"...","amount":"..."}],"steps":["...","...","..."]}]}
+
+Iga retsept peab olema maitsev, terviklik ja koostisained omavahel sobivad. Koostisained peavad olema konkreetsed kogused ${peopleCount === 4 ? '4+' : peopleCount} inimese jaoks.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await resp.json();
+    const text = data.content.map(i => i.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    currentRecipes = parsed.recipes;
+    renderRecipeCards(currentRecipes);
+  } catch(e) {
+    container.innerHTML = '<div class="status-msg">Midagi läks valesti. Proovi uuesti.</div>';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Paku mulle retsepte ✨';
+}
+
+function renderRecipeCards(recipes) {
+  const container = document.getElementById('recipes-container');
+  const modeLabel = modeType === 'healthy' ? 'healthy' : 'sin';
+  const modeBadge = modeType === 'healthy' ? '🥗 Tervislik' : '🔥 Patt';
+
+  container.innerHTML = recipes.map((r, i) => `
+    <div class="recipe-card" onclick="openRecipe(${i})">
+      <h3>${r.title}</h3>
+      <p>${r.description}</p>
+      <div class="meta">
+        <span class="badge">⏱ ${r.time}</span>
+        <span class="badge ${modeLabel}">${modeBadge}</span>
+        <span class="badge">👤 ${peopleCount === 4 ? '4+' : peopleCount}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+let pendingRecipeIdx = null;
+let ingredientStatus = {};
+
+function openRecipe(idx) {
+  pendingRecipeIdx = idx;
+  const r = currentRecipes[idx];
+  ingredientStatus = {};
+
+  const listEl = document.getElementById('ing-check-list');
+  listEl.innerHTML = r.ingredients.map((ing, i) => {
+    const inPantry = pantry.some(p => p.toLowerCase().includes(ing.name.toLowerCase()) || ing.name.toLowerCase().includes(p.toLowerCase()));
+    if (inPantry) ingredientStatus[i] = 'yes';
+    return `
+      <div class="ing-check-item">
+        <div class="ing-check-left">
+          <div class="ing-check-name">${ing.name}</div>
+          <div class="ing-check-amount">${ing.amount}</div>
+        </div>
+        <div class="ing-check-btns">
+          <button class="ing-btn yes ${inPantry ? 'sel' : ''}" id="yes-${i}" onclick="setIng(${i},'yes')">✓ On</button>
+          <button class="ing-btn no ${!inPantry ? 'sel' : ''}" id="no-${i}" onclick="setIng(${i},'no')">✗ Pole</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Set initial status for items not in pantry
+  r.ingredients.forEach((ing, i) => {
+    if (!ingredientStatus[i]) ingredientStatus[i] = 'no';
+  });
+
+  document.getElementById('ing-modal').classList.add('open');
+}
+
+function setIng(idx, status) {
+  ingredientStatus[idx] = status;
+  document.getElementById('yes-'+idx).classList.toggle('sel', status === 'yes');
+  document.getElementById('no-'+idx).classList.toggle('sel', status === 'no');
+}
+
+async function confirmIngredients() {
+  const r = currentRecipes[pendingRecipeIdx];
+  const missing = r.ingredients.filter((ing, i) => ingredientStatus[i] === 'no').map(ing => ing.name);
+
+  document.getElementById('ing-modal').classList.remove('open');
+
+  if (missing.length === 0) {
+    showFullRecipe(r);
+    return;
+  }
+
+  // Ask Claude for adapted recipe
+  const container = document.getElementById('recipes-container');
+  container.innerHTML = '<div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+
+  const have = r.ingredients.filter((ing, i) => ingredientStatus[i] === 'yes').map(ing => ing.name);
+
+  const prompt = `Sa oled professionaalne kokk. Kasutaja tahab teha retsepti "${r.title}" aga tal puuduvad: ${missing.join(', ')}.
+Olemas on: ${have.join(', ')} ja üldised varud: ${pantry.join(', ')}.
+
+Kohanda retsept nii et kasutab olemasolevaid asju. Paku asendused puuduvatele koostisosadele või muuda retsepti veidi.
+
+Vasta AINULT JSON formaadis:
+{"title":"...","description":"...","time":"...min","note":"Mis muutus (1 lause)","ingredients":[{"name":"...","amount":"..."}],"steps":["...","..."]}`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content.map(i => i.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const adapted = JSON.parse(clean);
+    currentRecipes[pendingRecipeIdx] = adapted;
+    showFullRecipe(adapted, true);
+  } catch(e) {
+    showFullRecipe(r);
+  }
+}
+
+function skipIngredientCheck() {
+  document.getElementById('ing-modal').classList.remove('open');
+  showFullRecipe(currentRecipes[pendingRecipeIdx]);
+}
+
+function showFullRecipe(r, adapted) {
+  const fullEl = document.getElementById('recipe-full');
+  const content = document.getElementById('recipe-full-content');
+
+  content.innerHTML = `
+    <h2>${r.title}</h2>
+    ${adapted && r.note ? `<div class="status-msg" style="margin-bottom:16px;color:var(--accent);">💡 ${r.note}</div>` : ''}
+    <div class="recipe-meta">
+      <span class="badge">⏱ ${r.time}</span>
+      <span class="badge">👤 ${peopleCount === 4 ? '4+' : peopleCount} inimest</span>
+    </div>
+    <div class="recipe-section-title">Koostisained</div>
+    <div class="ingredient-list">
+      ${r.ingredients.map(ing => `
+        <div class="ingredient-item">
+          <span>${ing.name}</span>
+          <span class="amount">${ing.amount}</span>
+        </div>
+      `).join('')}
+    </div>
+    <div class="recipe-section-title">Valmistamine</div>
+    <div class="steps-list">
+      ${r.steps.map((step, i) => `
+        <div class="step-item">
+          <div class="step-num">${i+1}</div>
+          <div class="step-text">${step}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  fullEl.classList.add('open');
+
+  const histItem = {
+    title: r.title,
+    time: r.time,
+    mealTime,
+    modeType,
+    people: peopleCount,
+    date: new Date().toLocaleDateString('et-EE'),
+    recipe: r
+  };
+  history.unshift(histItem);
+  if (history.length > 50) history.pop();
+  localStorage.setItem('recipeHistory', JSON.stringify(history));
+  renderHistory();
+}
+
+function closeRecipe() {
+  document.getElementById('recipe-full').classList.remove('open');
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  if (!history.length) {
+    el.innerHTML = '<div class="empty-state">Veel ühtegi retsepti ei ole avatud 🍽️</div>';
+    return;
+  }
+  el.innerHTML = history.map((h, i) => `
+    <div class="history-item" onclick="openHistoryRecipe(${i})">
+      <h4>${h.title}</h4>
+      <div class="hist-meta">${h.date} · ${h.mealTime === 'morning' ? '🌅 Hommik' : '🌙 Õhtu'} · ⏱ ${h.time}</div>
+    </div>
+  `).join('');
+}
+
+function openHistoryRecipe(idx) {
+  currentRecipes = [history[idx].recipe];
+  pendingRecipeIdx = 0;
+  peopleCount = history[idx].people;
+  mealTime = history[idx].mealTime;
+  modeType = history[idx].modeType;
+
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-cook').classList.add('active');
+  document.querySelectorAll('.nav-tab')[0].classList.add('active');
+
+  showFullRecipe(history[idx].recipe);
+}
+
+async function parseReceiptText(mode) {
+  const receiptText = document.getElementById('receipt-paste-text').value.trim();
+  if (!receiptText) return;
+
+  const statusEl = document.getElementById('scan-status');
+  statusEl.innerHTML = '<div class="status-msg">🤖 Parsin tšekki...</div>';
+
+  const prompt = `See on poe tšeki tekst. Loe välja kõik toiduained ja koostisained — ignoreeri pakendeid, kotid, paberid, joogid, mittetoiduained.
+
+Tšeki tekst:
+${receiptText}
+
+Vasta AINULT JSON formaadis: {"items":["toode1","toode2",...]}
+Toodete nimed lühidalt eesti keeles (nt "Kanafileed", "Feta juust", "Tom kha pasta"). Maksimaalselt 40 toodet.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    const responseText = data.content.map(i => i.text || '').join('');
+    const clean = responseText.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    if (mode === 'replace') {
+      pantry = [...new Set(parsed.items)];
+    } else {
+      parsed.items.forEach(item => {
+        if (!pantry.some(p => p.toLowerCase() === item.toLowerCase())) pantry.push(item);
+      });
+    }
+
+    savePantry();
+    renderPantry();
+    document.getElementById('receipt-paste-text').value = '';
+    document.getElementById('receipt-paste-box').style.display = 'none';
+    statusEl.innerHTML = `<div class="status-msg">✅ ${mode === 'replace' ? 'Varud asendatud' : 'Lisatud'} — kokku ${pantry.length} toodet</div>`;
+    setTimeout(() => statusEl.innerHTML = '', 3000);
+  } catch(e) {
+    console.error(e);
+    statusEl.innerHTML = `<div class="status-msg">❌ Viga: ${e.message}</div>`;
+    setTimeout(() => statusEl.innerHTML = '', 8000);
+  }
+}
+
+function toggleReceiptPaste() {
+  const box = document.getElementById('receipt-paste-box');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  if (box.style.display === 'block') document.getElementById('receipt-paste-text').focus();
+}
+
+function toggleImport() {
+  const box = document.getElementById('import-box');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  if (box.style.display === 'block') {
+    document.getElementById('import-text').focus();
+  }
+}
+
+function importItems(mode) {
+  const text = document.getElementById('import-text').value.trim();
+  if (!text) return;
+
+  const items = text
+    .split('\n')
+    .map(line => line.replace(/^[-•*\d.]+\s*/, '').trim())
+    .filter(line => line.length > 1);
+
+  if (mode === 'replace') {
+    pantry = [...new Set(items)];
+  } else {
+    items.forEach(item => {
+      if (!pantry.some(p => p.toLowerCase() === item.toLowerCase())) {
+        pantry.push(item);
+      }
+    });
+  }
+
+  savePantry();
+  renderPantry();
+  document.getElementById('import-text').value = '';
+  document.getElementById('import-box').style.display = 'none';
+
+  const statusEl = document.getElementById('scan-status');
+  statusEl.innerHTML = `<div class="status-msg">✅ ${mode === 'replace' ? 'Varud asendatud' : 'Lisatud'} — kokku ${pantry.length} toodet</div>`;
+  setTimeout(() => statusEl.innerHTML = '', 3000);
+}
+
+// PANTRY
+function addPantryItem() {
+  const input = document.getElementById('pantry-input');
+  const val = input.value.trim();
+  if (!val) return;
+  if (!pantry.includes(val)) {
+    pantry.push(val);
+    savePantry();
+  }
+  input.value = '';
+  renderPantry();
+}
+
+function removePantryItem(idx) {
+  pantry.splice(idx, 1);
+  savePantry();
+  renderPantry();
+}
+
+function savePantry() {
+  localStorage.setItem('pantry', JSON.stringify(pantry));
+}
+
+function renderPantry() {
+  const el = document.getElementById('pantry-list');
+  const count = document.getElementById('pantry-count');
+  count.textContent = pantry.length;
+
+  if (!pantry.length) {
+    el.innerHTML = '<div class="empty-state">Lisa esimene toode 👆</div>';
+    return;
+  }
+
+  el.innerHTML = pantry.map((item, i) => `
+    <div class="pantry-item">
+      <span class="pantry-item-name">${item}</span>
+      <button class="remove-btn" onclick="removePantryItem(${i})">×</button>
+    </div>
+  `).join('');
+}
+
+// RECEIPT SCAN
+async function scanReceipt(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const statusEl = document.getElementById('scan-status');
+  statusEl.innerHTML = '<div class="status-msg">📷 Loen tšekki...</div>';
+
+  const base64 = await new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('Lugemine ebaõnnestus'));
+    r.readAsDataURL(file);
+  });
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: file.type, data: base64 } },
+            { type: 'text', text: 'See on poe tšekk. Loe välja kõik toiduained ja koostisained. Vasta AINULT JSON formaadis: {"items":["toode1","toode2",...]}. Ära lisa hindu, koguseid ega muid andmeid, ainult toodete nimed eesti keeles, lihtsalt ja lühidalt.' }
+          ]
+        }]
+      })
+    });
+
+    const data = await resp.json();
+    const text = data.content.map(i => i.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    const newItems = parsed.items.filter(item => !pantry.includes(item));
+    pantry.push(...newItems);
+    savePantry();
+    renderPantry();
+    statusEl.innerHTML = `<div class="status-msg">✅ Lisatud ${newItems.length} uut toodet!</div>`;
+    setTimeout(() => statusEl.innerHTML = '', 3000);
+  } catch(e) {
+    statusEl.innerHTML = '<div class="status-msg">❌ Tšeki lugemine ebaõnnestus. Proovi uuesti.</div>';
+    setTimeout(() => statusEl.innerHTML = '', 3000);
+  }
+
+  input.value = '';
+}
+
+// SHOPPING LIST
+function saveShopList() {
+  localStorage.setItem('shopList', JSON.stringify(shopList));
+}
+
+function renderShopList() {
+  const el = document.getElementById('shop-list');
+  const count = document.getElementById('shop-count');
+  if (!el) return;
+  const active = shopList.filter(i => !i.checked);
+  count.textContent = active.length;
+
+  if (!shopList.length) {
+    el.innerHTML = '<div class="empty-state">Nimekiri on tühi 🛒</div>';
+    return;
+  }
+
+  el.innerHTML = shopList.map((item, i) => `
+    <div class="shop-item ${item.checked ? 'checked' : ''}" onclick="toggleShopItem(${i})">
+      <div class="shop-check">${item.checked ? '✓' : ''}</div>
+      <span>${item.name}</span>
+    </div>
+  `).join('');
+}
+
+function toggleShopItem(idx) {
+  shopList[idx].checked = !shopList[idx].checked;
+  saveShopList();
+  renderShopList();
+}
+
+function addShopItem() {
+  const input = document.getElementById('shop-input');
+  const val = input.value.trim();
+  if (!val) return;
+  shopList.push({ name: val, checked: false });
+  saveShopList();
+  renderShopList();
+  input.value = '';
+}
+
+function clearChecked() {
+  shopList = shopList.filter(i => !i.checked);
+  saveShopList();
+  renderShopList();
+}
+
+async function generateShopList() {
+  const statusEl = document.getElementById('shop-status');
+  statusEl.innerHTML = '<div class="status-msg">🤖 Mõtlen mis puudu on...</div>';
+
+  // Sync shop cuisine to cook page
+  if (shopCuisine !== cuisineType) {
+    cuisineType = shopCuisine;
+    const cuisines = ['', 'Eesti/Põhjamaa', 'Itaalia', 'Jaapani', 'Aasia', 'Mehhiko', 'Vahemere', 'India', 'Prantsuse'];
+    document.querySelectorAll('#cuisine-row .cuisine-btn').forEach((btn, i) => {
+      btn.classList.toggle('active', cuisines[i] === cuisineType);
+    });
+  }
+
+  const profileText = [
+    profile.likes ? 'Meeldib: ' + profile.likes : '',
+    profile.dislikes ? 'Ei söö: ' + profile.dislikes : '',
+    profile.other ? 'Muu: ' + profile.other : ''
+  ].filter(Boolean).join('. ');
+
+  const cuisineNote = shopCuisine
+    ? `Kasutaja plaanib järgmisel nädalal teha peamiselt ${shopCuisine} toite — arvesta selle köögi tüüpiliste koostisosadega.`
+    : 'Mix erinevaid köögistiile.';
+
+  const prompt = `Sa oled abivalmis köögiassistent. Kasutajal on kodus järgmised tooted: ${pantry.join(', ') || 'midagi pole'}.
+
+${profileText ? 'Kasutaja profiil: ' + profileText : ''}
+${cuisineNote}
+
+Genereeri ostunimekiri — tooted mida tasub juurde osta et kodus oleks hea valik igapäevaseks toiduvalmistamiseks. Mõtle läbi mis puudu on: põhitoiduained, valgud, köögiviljad, maitseained, piimatooted jne.
+
+Vasta AINULT JSON formaadis: {"items":["toode1","toode2",...]}
+Maksimaalselt 20 toodet. Ainult konkreetsed tooted, lühidalt.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content.map(i => i.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    const newItems = parsed.items
+      .filter(name => !shopList.find(s => s.name.toLowerCase() === name.toLowerCase()))
+      .map(name => ({ name, checked: false }));
+    shopList.push(...newItems);
+    saveShopList();
+    renderShopList();
+    statusEl.innerHTML = `<div class="status-msg">✅ Lisatud ${newItems.length} toodet (${shopCuisine || 'Mix'} suund)</div>`;
+    setTimeout(() => statusEl.innerHTML = '', 3000);
+  } catch(e) {
+    statusEl.innerHTML = '<div class="status-msg">❌ Midagi läks valesti.</div>';
+    setTimeout(() => statusEl.innerHTML = '', 3000);
+  }
+}
+
+// PROFILE
+function saveProfile() {
+  profile = {
+    likes: document.getElementById('pref-likes').value,
+    dislikes: document.getElementById('pref-dislikes').value,
+    spice: document.getElementById('pref-spice').value,
+    partner: document.getElementById('pref-partner').value,
+    other: document.getElementById('pref-other').value
+  };
+  localStorage.setItem('profile', JSON.stringify(profile));
+  alert('Profiil salvestatud! ✅');
+}
+
+function loadProfile() {
+  if (profile.likes) document.getElementById('pref-likes').value = profile.likes;
+  if (profile.dislikes) document.getElementById('pref-dislikes').value = profile.dislikes;
+  if (profile.spice) document.getElementById('pref-spice').value = profile.spice;
+  if (profile.partner) document.getElementById('pref-partner').value = profile.partner;
+  if (profile.other) document.getElementById('pref-other').value = profile.other;
+}
+</script>
+<!-- INGREDIENT CHECK MODAL -->
+<div id="ing-modal" class="ing-modal">
+  <div class="ing-modal-box">
+    <h3>Kontrolli koostisained</h3>
+    <p>Märgi mis sul kodus on — puuduvate asjade jaoks pakun asenduse või uue retsepti.</p>
+    <div id="ing-check-list"></div>
+    <div class="ing-modal-actions">
+      <button class="ing-confirm-btn" onclick="confirmIngredients()">Valmista see retsept ✓</button>
+      <button class="ing-skip-btn" onclick="skipIngredientCheck()">Jäta vahele, näita retsepti</button>
+    </div>
+  </div>
+</div>
+
+
+</html>
