@@ -1031,8 +1031,7 @@ async function getCookSuggestions() {
   const wish = document.getElementById('wish-input').value.trim();
 
   if (pantry.length === 0 && !wish) {
-    container.innerHTML = '<div class="status-msg">Lisa esmalt tooted varude nimekirja 🛒</div>';
-    return;
+    // Continue anyway with general pantry
   }
 
   btn.disabled = true;
