@@ -744,8 +744,20 @@
 </head>
 <body>
 
+<!-- API KEY SCREEN -->
+<div id="api-screen" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg); z-index:999; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px;">
+  <div style="font-family:'Playfair Display',serif; font-size:32px; color:var(--accent); margin-bottom:8px;">🍳</div>
+  <div style="font-family:'Playfair Display',serif; font-size:24px; color:var(--accent); margin-bottom:6px;">Köögiabiline</div>
+  <div style="font-size:13px; color:var(--muted); text-align:center; margin-bottom:30px;">Sisesta oma Anthropic API võti alustamiseks</div>
+  <input type="password" id="api-key-input" placeholder="sk-ant-..." style="width:100%; max-width:400px; background:var(--surface); border:2px solid var(--border); border-radius:12px; padding:14px 16px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; outline:none; margin-bottom:12px;">
+  <button onclick="saveApiKey()" style="width:100%; max-width:400px; padding:16px; border-radius:12px; border:none; background:var(--accent); color:#000; font-family:'Playfair Display',serif; font-size:18px; font-weight:700; cursor:pointer;">Alusta →</button>
+  <div style="font-size:11px; color:var(--muted); text-align:center; margin-top:16px;">Võti salvestatakse ainult sinu seadmesse.<br>Leia võti: console.anthropic.com → API keys</div>
+</div>
+
+<div id="main-app" style="display:none;">
 <div class="header">
   <div class="logo">🍳 Köögiabiline</div>
+  <button onclick="clearApiKey()" style="background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer;">Võti ×</button>
 </div>
 
 <div class="nav-tabs" style="margin: 12px 20px 0; overflow-x:auto; scrollbar-width:none;">
@@ -914,8 +926,51 @@
   <div id="recipe-full-content"></div>
 </div>
 
+</div> <!-- /main-app -->
+
 <script>
-// State
+// API KEY MANAGEMENT
+function getApiKey() {
+  return localStorage.getItem('apiKey') || '';
+}
+
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key.startsWith('sk-ant-')) {
+    alert('Palun sisesta korrektne API võti (algab sk-ant-)');
+    return;
+  }
+  localStorage.setItem('apiKey', key);
+  showApp();
+}
+
+function clearApiKey() {
+  if (confirm('Eemalda API võti?')) {
+    localStorage.removeItem('apiKey');
+    location.reload();
+  }
+}
+
+function showApp() {
+  document.getElementById('api-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = 'block';
+}
+
+// Check on load
+if (getApiKey()) {
+  showApp();
+} else {
+  document.getElementById('api-screen').style.display = 'flex';
+}
+
+function getHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'x-api-key': getApiKey(),
+    'anthropic-version': '2023-06-01',
+    'anthropic-dangerous-direct-browser-access': 'true'
+  };
+}
 let mealTime = 'morning';
 let modeType = 'healthy';
 let peopleCount = 1;
@@ -1013,7 +1068,7 @@ Iga retsept peab olema maitsev, terviklik ja koostisained omavahel sobivad. Koos
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -1121,7 +1176,7 @@ Vasta AINULT JSON formaadis:
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -1243,7 +1298,7 @@ Toodete nimed lühidalt eesti keeles (nt "Kanafileed", "Feta juust", "Tom kha pa
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -1378,7 +1433,7 @@ async function scanReceipt(input) {
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -1493,7 +1548,7 @@ Maksimaalselt 20 toodet. Ainult konkreetsed tooted, lühidalt.`;
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
